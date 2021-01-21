@@ -95,8 +95,16 @@ class TicTacToe():
 
         Return False if the specified index is unopen, or does not exist"""
 
+        # check for possibily valid
+        if where > (n2 - 1) or n < 0:
+            return False
 
-        pass
+        # check board position is empty
+        if self.board[where] != 0:
+            return False
+
+        self.board[where] = self.turn
+
 
     def show(self, stream=sys.stdout):
         """_ Part 2: Implement This Method _
