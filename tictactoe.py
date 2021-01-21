@@ -27,7 +27,7 @@ import sys
 
 
 def int_input(state, mover):
-    print("%s's turn...(0..%d)" % (TicTacToe.Chrs[mover], len(state)-1))
+    print("%s's turn...(0..%d)" % (TicTacToe.Chrs[mover], len(state) - 1))
     return int(input())
 
 
@@ -61,7 +61,7 @@ class TicTacToe():
             # ones (x's) go first
 
             # ensure imported state has valid amt of X's and O's
-            assert ones == negs or ones == negs+1, "X's (1's) go first."
+            assert ones == negs or ones == negs + 1, "X's (1's) go first."
             # esnures imported state is correct size
             assert len(state) == self.n2, "the specified state is not the correct length"
             # The game state is kept here as a list of values.
@@ -80,7 +80,7 @@ class TicTacToe():
 
         # new board
         else:
-            self.board = [0]*(self.n2)
+            self.board = [0] * (self.n2)
             self.turn = 1
 
     def move(self, where):
@@ -90,12 +90,11 @@ class TicTacToe():
         change turns to the next player; where is an index into the board in
         the range 0..(n**2-1)
 
-        check for
-
         If the specified index is a valid move, modify the board,
         change turns and return True.
 
         Return False if the specified index is unopen, or does not exist"""
+
 
         pass
 
@@ -103,8 +102,31 @@ class TicTacToe():
         """_ Part 2: Implement This Method _
 
         Displays the board on the specified stream."""
+        for i in range(self.n):
+            # first line of row
+            for j in range(self.n):
+                print(" " * 3, end='')
+                if j < (self.n - 1):
+                    print("|", end='')
+            print("")
 
-        pass
+            # second line of row-- with char
+            for j in range(self.n):
+                print(f" {x} ", end='')
+                if j < (self.n - 1):
+                    print("|", end='')
+            print("")
+
+            # 3rd line/ divider
+            if i < (self.n - 1):
+                for j in range(self.n):
+                    print("___", end='')
+                    if j < (self.n - 1):
+                        print("|", end='')
+                print("")
+        for j in range(self.n - 1):
+                print("   |", end='')
+        print("")
 
     def is_win(self):
         """_ Part 3: Implement This Method _
