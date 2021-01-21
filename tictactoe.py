@@ -105,7 +105,6 @@ class TicTacToe():
 
         self.board[where] = self.turn
 
-
     def show(self, stream=sys.stdout):
         """_ Part 2: Implement This Method _
 
@@ -154,7 +153,64 @@ class TicTacToe():
          False: if the end state is not yet determined
         """
         # column win
-        pass
+        # check start of each col for player char
+        notFull = 0
+
+        for i in range(self.n - 1):
+            wincount = 0
+            if self.board[i] == self.turn:
+                wincount += 1
+                # check for win
+                for j in range(1, self.n - 1):
+                    if self.board[i + (self.n * j)] == self.turn:
+                        wincount += 1
+                    else:
+                        break
+                if wincount == self.n:
+                    return (TicTacToe.Column, i, self.turn)
+
+        # diagonal win
+        # check for odd n -- diagonal only possible on odd boards
+        if n % 2 == 1:
+            # check middle spot -- can only win if owned by player
+            middlespot = (n * (n // 2) + (n // 2))
+            if self.turn == self.board[middlespot]:
+                curspot = 0
+                wincount = 0
+                # now check for a win
+                for i in range(n):
+                    if curspot == self.turn:
+                        wincount += 1
+                        curspot += (n + 1)
+                    else:
+                        break
+                if wincount == self.n:
+                    return (TicTacToe.Diagonal, 0, self.turn)
+
+                curspot = (n - 1)
+                wincount = 0
+                for i in range(n):
+                    if curspot == self.turn:
+                        wincount += 1
+                        curspot += (n - 1)
+                    else:
+                        break
+                if wincount == self.n:
+                    return (TicTacToe.Diagonal, 1, self.turn)
+
+        # row win
+        for i in range(self.n - 1, self.n2 - self.n, self.n):
+            wincount = 0
+            if self.board[i] == self.turn:
+                wincount += 1
+                for j in range(i + 1, i + n):
+                    if self.board[j] == self.turn:
+                        wincount += 1
+                    elif self.board[j] == 0:
+                        notFull = 1
+                if wincount == self.n:
+                    return (TicTacToe.Row, i, self.turn)
+
 
     def describe_win(self, win):
         """Provides a text representation of an end-game state."""
