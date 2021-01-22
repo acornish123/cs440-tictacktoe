@@ -24,6 +24,7 @@ Answer the following questions using your implementation:
 
 """
 import sys
+from random import randrange
 
 
 def int_input(state, mover):
@@ -54,7 +55,6 @@ class TicTacToe():
         -1 represents an 'O' (player 2), 0 represents an empty space and
         1 represents an 'X' (player 1).  The state is assumed to have an
         appropriate number of 'X's relative to the number of 'O's."""
-        print("reset")
         if state:
             ones = sum([1 for i in state if i == 1])
             negs = sum([1 for i in state if i == -1])
@@ -76,8 +76,7 @@ class TicTacToe():
             if s == 0:
                 self.turn = 1
             else:
-                self.turn = 1
-                # self.turn = -1
+                self.turn = -1
 
         # new board
         else:
@@ -96,17 +95,13 @@ class TicTacToe():
 
         Return False if the specified index is unopen, or does not exist"""
 
-        # check for possibily valid
-        if where > (n2 - 1) or n < 0:
-            return False
-
-        # check board position is empty
-        if self.board[where] != 0:
+        # check for possibily valid (within board) and empty spot
+        if where > (self.n2 - 1) or self.n < 0 or self.board[where] != 0:
             return False
 
         self.board[where] = self.turn
 
-
+        # change turns
         if self.turn == 1:
             self.turn = -1
         else:
@@ -114,19 +109,14 @@ class TicTacToe():
 
         return True
 
+    # pushes board out from left edge
     def leftMargin(self, spacing=5):
-        print(" " * int(spacing), end='')
-
-
-
+        print(" " * spacing, end='')
 
     def show(self, stream=sys.stdout):
         """_ Part 2: Implement This Method _
-
         Displays the board on the specified stream."""
-        # x = 'X'
         sys.stdout = stream
-        print("show")
         for i in range(self.n):
             # first line of row
             self.leftMargin()
@@ -141,15 +131,20 @@ class TicTacToe():
 
             for j in range(self.n):
                 mark = ' '
-                if self.board[(i * self.n) + j] == -1:
+                curSpot = (i * self.n) + j
+                idSpot = curSpot
+                if self.board[curSpot] == -1:
                     mark = 'O'
+                    idSpot = ' '
                     # mark = (i * self.n) + j
-                elif self.board[(i * self.n) + j] == 1:
+                elif self.board[curSpot] == 1:
                     mark = 'X'
-                    # mark = (i * self.n) + j
+                    idSpot = ' '
 
-                print(f" {mark} ", end='')
-                # print(f" {self.board[i]} ", end='')
+                if mark == ' ' and idSpot > 9:
+                    mark = ''
+
+                print(f"{idSpot}{mark} ", end='')
                 if j < (self.n - 1):
                     print("|", end='')
             print("")
@@ -163,8 +158,9 @@ class TicTacToe():
                     if j < (self.n - 1):
                         print("|", end='')
                 print("")
+
         for j in range(self.n - 1):
-                print("   |", end='')
+            print("   |", end='')
         print("")
 
     def is_win(self):
@@ -188,71 +184,72 @@ class TicTacToe():
         # check start of each col for player char
         boardFull = 1
 
+        checkFor = 1
+        if self.turn == 1:
+            checkFor = -1
+
         for i in range(self.n):
             wincount = 0
 
-            if self.board[i] == self.turn:
+            if self.board[i] == checkFor:
                 wincount += 1
                 # check for win
                 for j in range(1, self.n):
-                    if self.board[i + (self.n * j)] == self.turn:
+                    if self.board[i + (self.n * j)] == checkFor:
                         wincount += 1
                     else:
                         break
                 if wincount == self.n:
-                    print("col win")
-                    return (TicTacToe.Column, i, self.turn)
+                    # print("col win")
+                    return (TicTacToe.Column, i, checkFor)
 
         # diagonal win
         # check for odd n -- diagonal only possible on odd boards
         if self.n % 2 == 1:
             # check middle spot -- can only win if owned by player
             middlespot = (self.n * (self.n // 2) + (self.n // 2))
-            print(f"middlespot = {middlespot}")
-            print(f"middlespot board = {self.board[middlespot]}")
 
-            if self.turn == self.board[middlespot]:
+            if checkFor == self.board[middlespot]:
                 # python3 tictactoe.py --state 121212211 --play
-                print("yay")
                 curspot = 0
                 wincount = 0
                 # now check for win from top left
                 for i in range(self.n):
-                    if self.board[curspot] == self.turn:
+                    if self.board[curspot] == checkFor:
                         wincount += 1
                         curspot += (self.n + 1)
                     else:
                         break
                 if wincount == self.n:
-                    print("X win")
-                    return (TicTacToe.Diagonal, 0, self.turn)
+                    # print("X win")
+                    return (TicTacToe.Diagonal, 0, checkFor)
 
                 # check for win from top right
                 curspot = (self.n - 1)
                 wincount = 0
                 for i in range(self.n):
                     # python3 tictactoe.py --state 121212112 --play
-                    if self.board[curspot] == self.turn:
+                    if self.board[curspot] == checkFor:
                         wincount += 1
                         curspot += (self.n - 1)
                     else:
                         break
                 if wincount == self.n:
-                    print("X2 win")
+                    # print("X2 win")
 
-                    return (TicTacToe.Diagonal, 1, self.turn)
+                    return (TicTacToe.Diagonal, 1, checkFor)
 
-        # row win
+        # row win - also checks for empty spots / stalemate
         for i in range(0, self.n2, self.n):
             wincount = 0
             for j in range(i, i + self.n):
-                if self.board[j] == self.turn:
+                if self.board[j] == checkFor:
                     wincount += 1
                 elif self.board[j] == 0:
                     boardFull = 0
             if wincount == self.n:
                 print("row win")
-                return (TicTacToe.Row, i, self.turn)
+                return (TicTacToe.Row, i, checkFor)
 
         if boardFull == 1:
             print("stalemate")
@@ -260,7 +257,6 @@ class TicTacToe():
         else:
             print("not full")
             return False
-
 
     def describe_win(self, win):
         """Provides a text representation of an end-game state."""
@@ -307,19 +303,30 @@ class TicTacToe():
           (1) the game state; and (2) the current player
         """
 
-        temp = 0
-        # while self.is_win() == False:
-        while True and temp < 5:
+        # temp = 0
+        # while True and temp < 8:
+        while True:
             if outstream:
                 self.show()
-            temp += 1
-            if self.is_win() != False:
-                print("winner")
+
+            # get state
+            theState = self.get_state()
+
+            theMove = movefn(theState, self.turn)
+
+            validMove = self.move(theMove)
+
+            while not validMove:
+                theMove = movefn(theState, self.turn)
+                validMove = self.move(theMove)
+
+
+            checkWin = self.is_win()
+
+            if checkWin:
+                print(self.describe_win(checkWin))
+
                 break
-
-
-
-
 
     def get_state(self):
         """Get the state of the board as an immutable tuple"""
@@ -377,9 +384,7 @@ if __name__ == "__main__":
 
     t = TicTacToe(args.n)
     if args.play:
-        print("args.play")
         t.reset(state)
-        print("args.play2")
 
         t.play(outstream=sys.stdout)
         # t.play()
