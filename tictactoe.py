@@ -130,17 +130,22 @@ class TicTacToe():
             self.leftMargin()
 
             for j in range(self.n):
-                mark = ' '
+                mark = TicTacToe.Chrs[0]
+                # mark = ' '
                 curSpot = (i * self.n) + j
                 idSpot = curSpot
                 if self.board[curSpot] == -1:
-                    mark = 'O'
+                    # mark = 'O'
+                    mark = TicTacToe.Chrs[-1]
                     idSpot = ' '
                     # mark = (i * self.n) + j
                 elif self.board[curSpot] == 1:
-                    mark = 'X'
+                    # mark = 'X'
+                    mark = TicTacToe.Chrs[1]
+
                     idSpot = ' '
 
+                # allow for id on boards larger than n = 9
                 if mark == ' ' and idSpot > 9:
                     mark = ''
 
@@ -189,18 +194,27 @@ class TicTacToe():
         for i in range(self.n):
             wincount = 0
 
+            # if self.board[i] != 0:
+            #     player = self.board[i]
+            #     wincount += 1
+            #     # check for win
+            #     for j in range(1, self.n):
+            #         if self.board[i + (self.n * j)] == player:
+            #             wincount += 1
+            #         else:
+            #             break
+            #     if wincount == self.n:
+            #         # print("col win")
+            #         return (TicTacToe.Column, i, player)
+
             if self.board[i] != 0:
-                player = self.board[i]
-                wincount += 1
-                # check for win
-                for j in range(1, self.n):
-                    if self.board[i + (self.n * j)] == player:
-                        wincount += 1
-                    else:
-                        break
-                if wincount == self.n:
+                curSpot = i
+                for j in range(0, self.n):
+                    wincount += self.board[curSpot]
+                    curSpot += self.n
+                if abs(wincount) == self.n:
                     # print("col win")
-                    return (TicTacToe.Column, i, player)
+                    return (TicTacToe.Column, i, self.board[i])
 
         # diagonal win
         # check for odd n -- diagonal only possible on odd boards
@@ -210,49 +224,75 @@ class TicTacToe():
 
             if self.board[middlespot] != 0:
                 # python3 tictactoe.py --state 121212211 --play
-                player = self.board[middlespot]
-                curspot = 0
+                # player = self.board[middlespot]
+                curSpot = 0
                 wincount = 0
                 # now check for win from top left
+                # for i in range(self.n):
+                #     if self.board[curspot] == player:
+                #         wincount += 1
+                #         curspot += (self.n + 1)
+                #     else:
+                #         break
+                # if wincount == self.n:
+                #     # print("X win")
+                #     return (TicTacToe.Diagonal, 0, player)
+
                 for i in range(self.n):
-                    if self.board[curspot] == player:
-                        wincount += 1
-                        curspot += (self.n + 1)
-                    else:
-                        break
-                if wincount == self.n:
+                    wincount += self.board[curSpot]
+                    curSpot += (self.n + 1)
+                if abs(wincount) == self.n:
                     # print("X win")
-                    return (TicTacToe.Diagonal, 0, player)
+                    return (TicTacToe.Diagonal, 0, self.board[middlespot])
 
                 # check for win from top right
-                curspot = (self.n - 1)
+                curSpot = (self.n - 1)
                 wincount = 0
+                # for i in range(self.n):
+                #     # python3 tictactoe.py --state 121212112 --play
+                #     if self.board[curspot] == player:
+                #         wincount += 1
+                #         curspot += (self.n - 1)
+                #     else:
+                #         break
+                # if wincount == self.n:
+                #     return (TicTacToe.Diagonal, 1, player)
+
                 for i in range(self.n):
                     # python3 tictactoe.py --state 121212112 --play
-                    if self.board[curspot] == player:
-                        wincount += 1
-                        curspot += (self.n - 1)
-                    else:
-                        break
-                if wincount == self.n:
-                    return (TicTacToe.Diagonal, 1, player)
+                    wincount += self.board[curSpot]
+                    curSpot += (self.n - 1)
+                if abs(wincount) == self.n:
+                    return (TicTacToe.Diagonal, 1, self.board[middlespot])
 
         # row win - also checks for empty spots / stalemate
+        # for i in range(0, self.n2, self.n):
+        #     wincount = 0
+        #     player = self.board[i]
+        #     if player != 0:
+        #         for j in range(i, i + self.n):
+        #             if self.board[j] == 0:
+        #                 boardFull = False
+        #                 break
+        #             elif self.board[j] == player:
+        #                 wincount += 1
+        #     else:
+        #         boardFull = False
+
         for i in range(0, self.n2, self.n):
             wincount = 0
-            player = self.board[i]
-            if player != 0:
+            if self.board[i] != 0:
                 for j in range(i, i + self.n):
                     if self.board[j] == 0:
                         boardFull = False
                         break
-                    elif self.board[j] == player:
-                        wincount += 1
+                    else:
+                        wincount += self.board[j]
             else:
                 boardFull = False
 
-            if wincount == self.n:
-                return (TicTacToe.Row, i // self.n, player)
+            if abs(wincount) == self.n:
+                return (TicTacToe.Row, i // self.n, self.board[i])
 
         if boardFull:
             return (TicTacToe.StaleMate, 0, 0)
@@ -306,9 +346,7 @@ class TicTacToe():
 
         # temp = 0
         # while True and temp < 8:
-        self.show()
         checkWin = self.is_win()
-        print(checkWin)
 
         while not checkWin:
             if outstream:
@@ -326,6 +364,8 @@ class TicTacToe():
                 validMove = self.move(theMove)
 
             checkWin = self.is_win()
+
+
 
         if checkWin:
             print(self.describe_win(checkWin))
@@ -349,8 +389,66 @@ def mc(state, n, debug=False):
     (games played, % won by player-1, % won by player-2, % stalemates)
 
     """
+    games = 0
+    xWin = 0
+    oWin = 0
+    stale = 0
+    t = TicTacToe(args.n)
 
-    pass
+    availMoves = []
+    for i in range(len(state)):
+        if state[i] == 0:
+            availMoves.append(i)
+
+    print(f"availMoves: {availMoves}")
+
+    for i in range (n):
+        t.reset(state)
+        remMoves = availMoves.copy()
+        print(f"remMoves: {remMoves}")
+
+        checkWin = t.is_win()
+
+        while not checkWin:
+            moveIndex = randrange(len(remMoves))
+
+            print(f"remMoves: {remMoves}")
+
+            theMove = remMoves.pop(moveIndex)
+            print(f"theMove: {theMove}")
+
+            print(f"remMoves: {remMoves}")
+
+            print(f"theMove: {theMove}")
+
+            t.move(theMove)
+
+            checkWin = t.is_win()
+
+        # (games, one, two, stale) = mc(state, args.mc)
+
+        if checkWin:
+            print(f"checkWin[1]: {checkWin[1]}")
+            games += 1
+            if checkWin[2] == 1:
+                xWin += 1
+            elif checkWin[2] == -1:
+                oWin += 1
+            else:
+                stale += 1
+            print(f"checkWin: {checkWin}")
+            print(t.describe_win(checkWin))
+
+    return (games, xWin, oWin, stale)
+
+
+
+        #     if abs(wincount) == self.n:
+        #         return (TicTacToe.Row, i // self.n, self.board[i])
+
+        # if boardFull:
+        #     return (TicTacToe.StaleMate, 0, 0)
+
 
 
 if __name__ == "__main__":
