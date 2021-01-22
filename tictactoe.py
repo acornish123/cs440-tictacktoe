@@ -232,7 +232,6 @@ class TicTacToe():
             if self.board[i] == self.turn:
                 wincount += 1
                 for j in range(i + 1, i + self.n):
-                    print(j)
                     if self.board[j] == self.turn:
                         wincount += 1
                     elif self.board[j] == 0:
@@ -243,12 +242,11 @@ class TicTacToe():
             elif self.board[i] == 0:
                 boardFull = 1
 
-        if boardFull == 0:
-            print("not full")
+        if boardFull:
+            print("stalemate")
             return (TicTacToe.StaleMate, 0, 0)
         else:
-            print("false win")
-
+            print("not full")
             return False
 
 
@@ -296,7 +294,9 @@ class TicTacToe():
         the movefn should take two arguments:
           (1) the game state; and (2) the current player
         """
+        print("self.is_win")
         print (self.is_win())
+        print("self.is_win2")
 
         if outstream:
             self.show()
