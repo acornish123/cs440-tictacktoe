@@ -52,12 +52,12 @@ class TicTacToeTests(unittest.TestCase):
         t.reset(state)
         self.assertEqual(t.is_win(), (ttt.TicTacToe.StaleMate, 0, 0), "Stalemate is not detected.")
 
-    # def testEndGameLargeBoard(self):
-    #     t = ttt.TicTacToe(4)
-    #     t.reset([1,1,1,0,-1,-1,-1,0,0,0,0,0,0,0,0,0])
-    #     self.assertFalse(t.is_win())
-    #     t.reset([1,1,1,1,1,0,0,-1,-1,0,0,-1,-1,0,0,0])
-    #     self.assertEquals(t.is_win(), (ttt.TicTacToe.Row, 0, 1))
+    def testEndGameLargeBoard(self):
+        t = ttt.TicTacToe(4)
+        t.reset([1, 1, 1, 0, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        self.assertFalse(t.is_win())
+        t.reset([1, 1, 1, 1, 1, 0, 0, -1, -1, 0, 0, -1, -1, 0, 0, 0])
+        self.assertEqual(t.is_win(), (ttt.TicTacToe.Row, 0, 1))
 
     # def testCommandLine1(self):
     #     cmd = 'python3 tictactoe.py --state 102022110 --mc 10000'

@@ -182,26 +182,25 @@ class TicTacToe():
         """
         # column win
         # check start of each col for player char
-        boardFull = 1
+        boardFull = True
 
-        checkFor = 1
-        if self.turn == 1:
-            checkFor = -1
+        player = 1
 
         for i in range(self.n):
             wincount = 0
 
-            if self.board[i] == checkFor:
+            if self.board[i] != 0:
+                player = self.board[i]
                 wincount += 1
                 # check for win
                 for j in range(1, self.n):
-                    if self.board[i + (self.n * j)] == checkFor:
+                    if self.board[i + (self.n * j)] == player:
                         wincount += 1
                     else:
                         break
                 if wincount == self.n:
                     # print("col win")
-                    return (TicTacToe.Column, i, checkFor)
+                    return (TicTacToe.Column, i, player)
 
         # diagonal win
         # check for odd n -- diagonal only possible on odd boards
@@ -209,53 +208,55 @@ class TicTacToe():
             # check middle spot -- can only win if owned by player
             middlespot = (self.n * (self.n // 2) + (self.n // 2))
 
-            if checkFor == self.board[middlespot]:
+            if self.board[middlespot] != 0:
                 # python3 tictactoe.py --state 121212211 --play
+                player = self.board[middlespot]
                 curspot = 0
                 wincount = 0
                 # now check for win from top left
                 for i in range(self.n):
-                    if self.board[curspot] == checkFor:
+                    if self.board[curspot] == player:
                         wincount += 1
                         curspot += (self.n + 1)
                     else:
                         break
                 if wincount == self.n:
                     # print("X win")
-                    return (TicTacToe.Diagonal, 0, checkFor)
+                    return (TicTacToe.Diagonal, 0, player)
 
                 # check for win from top right
                 curspot = (self.n - 1)
                 wincount = 0
                 for i in range(self.n):
                     # python3 tictactoe.py --state 121212112 --play
-                    if self.board[curspot] == checkFor:
+                    if self.board[curspot] == player:
                         wincount += 1
                         curspot += (self.n - 1)
                     else:
                         break
                 if wincount == self.n:
-                    # print("X2 win")
-
-                    return (TicTacToe.Diagonal, 1, checkFor)
+                    return (TicTacToe.Diagonal, 1, player)
 
         # row win - also checks for empty spots / stalemate
         for i in range(0, self.n2, self.n):
             wincount = 0
-            for j in range(i, i + self.n):
-                if self.board[j] == checkFor:
-                    wincount += 1
-                elif self.board[j] == 0:
-                    boardFull = 0
-            if wincount == self.n:
-                print("row win")
-                return (TicTacToe.Row, i, checkFor)
+            player = self.board[i]
+            if player != 0:
+                for j in range(i, i + self.n):
+                    if self.board[j] == 0:
+                        boardFull = False
+                        break
+                    elif self.board[j] == player:
+                        wincount += 1
+            else:
+                boardFull = False
 
-        if boardFull == 1:
-            print("stalemate")
+            if wincount == self.n:
+                return (TicTacToe.Row, i // self.n, player)
+
+        if boardFull:
             return (TicTacToe.StaleMate, 0, 0)
         else:
-            print("not full")
             return False
 
     def describe_win(self, win):
@@ -305,7 +306,11 @@ class TicTacToe():
 
         # temp = 0
         # while True and temp < 8:
-        while True:
+        self.show()
+        checkWin = self.is_win()
+        print(checkWin)
+
+        while not checkWin:
             if outstream:
                 self.show()
 
@@ -320,13 +325,11 @@ class TicTacToe():
                 theMove = movefn(theState, self.turn)
                 validMove = self.move(theMove)
 
-
             checkWin = self.is_win()
 
-            if checkWin:
-                print(self.describe_win(checkWin))
+        if checkWin:
+            print(self.describe_win(checkWin))
 
-                break
 
     def get_state(self):
         """Get the state of the board as an immutable tuple"""
