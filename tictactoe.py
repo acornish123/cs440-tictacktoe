@@ -56,7 +56,7 @@ class TicTacToe():
         appropriate number of 'X's relative to the number of 'O's."""
         print("reset")
         if state:
-            ones = sum([i for i in state if i == 1])
+            ones = sum([1 for i in state if i == 1])
             negs = sum([1 for i in state if i == -1])
             # ones (x's) go first
 
@@ -76,7 +76,8 @@ class TicTacToe():
             if s == 0:
                 self.turn = 1
             else:
-                self.turn = -1
+                self.turn = 1
+                # self.turn = -1
 
         # new board
         else:
@@ -104,6 +105,14 @@ class TicTacToe():
             return False
 
         self.board[where] = self.turn
+
+
+        if self.turn == 1:
+            self.turn = -1
+        else:
+            self.turn = 1
+
+        return True
 
     def leftMargin(self, spacing=5):
         print(" " * int(spacing), end='')
@@ -177,14 +186,15 @@ class TicTacToe():
         """
         # column win
         # check start of each col for player char
-        boardFull = 0
+        boardFull = 1
 
-        for i in range(self.n - 1):
+        for i in range(self.n):
             wincount = 0
+
             if self.board[i] == self.turn:
                 wincount += 1
                 # check for win
-                for j in range(1, self.n - 1):
+                for j in range(1, self.n):
                     if self.board[i + (self.n * j)] == self.turn:
                         wincount += 1
                     else:
@@ -198,25 +208,31 @@ class TicTacToe():
         if self.n % 2 == 1:
             # check middle spot -- can only win if owned by player
             middlespot = (self.n * (self.n // 2) + (self.n // 2))
+            print(f"middlespot = {middlespot}")
+            print(f"middlespot board = {self.board[middlespot]}")
+
             if self.turn == self.board[middlespot]:
+                # python3 tictactoe.py --state 121212211 --play
+                print("yay")
                 curspot = 0
                 wincount = 0
-                # now check for a win
+                # now check for win from top left
                 for i in range(self.n):
-                    if curspot == self.turn:
+                    if self.board[curspot] == self.turn:
                         wincount += 1
                         curspot += (self.n + 1)
                     else:
                         break
                 if wincount == self.n:
                     print("X win")
-
                     return (TicTacToe.Diagonal, 0, self.turn)
 
+                # check for win from top right
                 curspot = (self.n - 1)
                 wincount = 0
                 for i in range(self.n):
-                    if curspot == self.turn:
+                    # python3 tictactoe.py --state 121212112 --play
+                    if self.board[curspot] == self.turn:
                         wincount += 1
                         curspot += (self.n - 1)
                     else:
@@ -227,22 +243,18 @@ class TicTacToe():
                     return (TicTacToe.Diagonal, 1, self.turn)
 
         # row win
-        for i in range(self.n - 1, self.n2 - self.n, self.n):
+        for i in range(0, self.n2, self.n):
             wincount = 0
-            if self.board[i] == self.turn:
-                wincount += 1
-                for j in range(i + 1, i + self.n):
-                    if self.board[j] == self.turn:
-                        wincount += 1
-                    elif self.board[j] == 0:
-                        boardFull = 1
-                if wincount == self.n:
-                    print("row win")
-                    return (TicTacToe.Row, i, self.turn)
-            elif self.board[i] == 0:
-                boardFull = 1
+            for j in range(i, i + self.n):
+                if self.board[j] == self.turn:
+                    wincount += 1
+                elif self.board[j] == 0:
+                    boardFull = 0
+            if wincount == self.n:
+                print("row win")
+                return (TicTacToe.Row, i, self.turn)
 
-        if boardFull:
+        if boardFull == 1:
             print("stalemate")
             return (TicTacToe.StaleMate, 0, 0)
         else:
@@ -294,19 +306,17 @@ class TicTacToe():
         the movefn should take two arguments:
           (1) the game state; and (2) the current player
         """
-        print("self.is_win")
-        print (self.is_win())
-        print("self.is_win2")
-
-        if outstream:
-            self.show()
 
         temp = 0
         # while self.is_win() == False:
-        while self.is_win() == False and temp < 5:
+        while True and temp < 5:
             if outstream:
                 self.show()
             temp += 1
+            if self.is_win() != False:
+                print("winner")
+                break
+
 
 
 
