@@ -1,0 +1,19 @@
+Answer the following questions using your implementation:
+
+1. Is it significantly better to play as 'X', or 'O', or neither?
+
+2. Describe an approach that will allow you to test if all first moves
+   are equally good for 'X'. The method should be valid (yields
+   correct results) and efficient (use minimal calculation).
+
+3. Using the method described in (2), are all first moves for 'X'
+   equally good?  If so, what are the odds that 'X' will win?  If not
+   which is the best move for 'X' and how much does it improve the
+   odds 'X' will win over the second best move?
+
+3. If 'X' moves into the bottom middle square, what is O's best
+   response? (i.e.  the response that is *least likely* to yield a win
+   for X)?
+
+4. As the board gets bigger, is X's first move more, or less,
+   strategically important?

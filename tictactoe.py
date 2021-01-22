@@ -5,22 +5,64 @@ Your Name Goes Here
 Answer the following questions using your implementation:
 
 1. Is it significantly better to play as 'X', or 'O', or neither?
+    It roughly twice as likely to win as 'X' than 'O'.in a standard size game.
+    Results: 10000000 trials: 1 wins 0.59, -1 wins 0.29, stalemates 0.13
 
 2. Describe an approach that will allow you to test if all first moves
    are equally good for 'X'. The method should be valid (yields
    correct results) and efficient (use minimal calculation).
+    There are only three starting moves that are actually different.
+    'X' can start in a corner, the middle, or a side.
+
 
 3. Using the method described in (2), are all first moves for 'X'
    equally good?  If so, what are the odds that 'X' will win?  If not
    which is the best move for 'X' and how much does it improve the
    odds 'X' will win over the second best move?
 
+    The best move for 'X' is to start in the middle spot.  This provides
+    a 69% chance for winning, which is 8% greater than starting in a corner.
+
+    Middle: State is: (0, 0, 0, 0, 1, 0, 0, 0, 0)
+    10000000 trials: 1 wins 0.69, -1 wins 0.19, stalemates 0.11
+
+    Corner: State is: (1, 0, 0, 0, 0, 0, 0, 0, 0)
+    10000000 trials: 1 wins 0.61, -1 wins 0.26, stalemates 0.13
+
+    Side: State is: (0, 1, 0, 0, 0, 0, 0, 0, 0)
+    10000000 trials: 1 wins 0.54, -1 wins 0.34, stalemates 0.13
+
+
 3. If 'X' moves into the bottom middle square, what is O's best
    response? (i.e.  the response that is *least likely* to yield a win
    for X)?
+    The best response is to take the middle spot.
+
+    State is: (0, 0, 0, 0, -1, 0, 0, 1, 0)
+    10000000 trials: 1 wins 0.41, -1 wins 0.44, stalemates 0.14
+
+    python3 tictactoe.py --state 000000210 --mc 1000000
+    python3 tictactoe.py --state 000002010 --mc 1000000
+    python3 tictactoe.py --state 000020010 --mc 1000000
+    python3 tictactoe.py --state 002000010 --mc 1000000
+    python3 tictactoe.py --state 020000010 --mc 1000000
+
+
 
 4. As the board gets bigger, is X's first move more, or less,
    strategically important?
+
+   X's first move becomes much less strategically important.
+
+python3 tictactoe.py  -n 5 --state 0000000000000000000000001 --mc 1000000
+python3 tictactoe.py  -n 5 --state 0000000000000000000000010 --mc 1000000
+python3 tictactoe.py  -n 5 --state 0000000000000000000000100 --mc 1000000
+python3 tictactoe.py  -n 5 --state 0000000000000000001000000 --mc 1000000
+python3 tictactoe.py  -n 5 --state 0000000000000000010000000 --mc 1000000
+python3 tictactoe.py  -n 5 --state 0000000000001000000000000 --mc 1000000
+
+python3 tictactoe.py  -n 7 --state 0000000000000000000000001000000000000000000000000 --mc 1000000
+
 
 """
 import sys
@@ -194,19 +236,6 @@ class TicTacToe():
         for i in range(self.n):
             wincount = 0
 
-            # if self.board[i] != 0:
-            #     player = self.board[i]
-            #     wincount += 1
-            #     # check for win
-            #     for j in range(1, self.n):
-            #         if self.board[i + (self.n * j)] == player:
-            #             wincount += 1
-            #         else:
-            #             break
-            #     if wincount == self.n:
-            #         # print("col win")
-            #         return (TicTacToe.Column, i, player)
-
             if self.board[i] != 0:
                 curSpot = i
                 for j in range(0, self.n):
@@ -223,40 +252,18 @@ class TicTacToe():
             middlespot = (self.n * (self.n // 2) + (self.n // 2))
 
             if self.board[middlespot] != 0:
-                # python3 tictactoe.py --state 121212211 --play
-                # player = self.board[middlespot]
                 curSpot = 0
                 wincount = 0
-                # now check for win from top left
-                # for i in range(self.n):
-                #     if self.board[curspot] == player:
-                #         wincount += 1
-                #         curspot += (self.n + 1)
-                #     else:
-                #         break
-                # if wincount == self.n:
-                #     # print("X win")
-                #     return (TicTacToe.Diagonal, 0, player)
 
                 for i in range(self.n):
                     wincount += self.board[curSpot]
                     curSpot += (self.n + 1)
                 if abs(wincount) == self.n:
-                    # print("X win")
                     return (TicTacToe.Diagonal, 0, self.board[middlespot])
 
                 # check for win from top right
                 curSpot = (self.n - 1)
                 wincount = 0
-                # for i in range(self.n):
-                #     # python3 tictactoe.py --state 121212112 --play
-                #     if self.board[curspot] == player:
-                #         wincount += 1
-                #         curspot += (self.n - 1)
-                #     else:
-                #         break
-                # if wincount == self.n:
-                #     return (TicTacToe.Diagonal, 1, player)
 
                 for i in range(self.n):
                     # python3 tictactoe.py --state 121212112 --play
@@ -264,20 +271,6 @@ class TicTacToe():
                     curSpot += (self.n - 1)
                 if abs(wincount) == self.n:
                     return (TicTacToe.Diagonal, 1, self.board[middlespot])
-
-        # row win - also checks for empty spots / stalemate
-        # for i in range(0, self.n2, self.n):
-        #     wincount = 0
-        #     player = self.board[i]
-        #     if player != 0:
-        #         for j in range(i, i + self.n):
-        #             if self.board[j] == 0:
-        #                 boardFull = False
-        #                 break
-        #             elif self.board[j] == player:
-        #                 wincount += 1
-        #     else:
-        #         boardFull = False
 
         for i in range(0, self.n2, self.n):
             wincount = 0
@@ -344,8 +337,6 @@ class TicTacToe():
           (1) the game state; and (2) the current player
         """
 
-        # temp = 0
-        # while True and temp < 8:
         checkWin = self.is_win()
 
         while not checkWin:
@@ -400,35 +391,22 @@ def mc(state, n, debug=False):
         if state[i] == 0:
             availMoves.append(i)
 
-    print(f"availMoves: {availMoves}")
-
-    for i in range (n):
+    for i in range(n):
         t.reset(state)
         remMoves = availMoves.copy()
-        print(f"remMoves: {remMoves}")
 
         checkWin = t.is_win()
 
         while not checkWin:
+            # get random move from valid move list
             moveIndex = randrange(len(remMoves))
-
-            print(f"remMoves: {remMoves}")
-
             theMove = remMoves.pop(moveIndex)
-            print(f"theMove: {theMove}")
-
-            print(f"remMoves: {remMoves}")
-
-            print(f"theMove: {theMove}")
 
             t.move(theMove)
 
             checkWin = t.is_win()
 
-        # (games, one, two, stale) = mc(state, args.mc)
-
         if checkWin:
-            print(f"checkWin[1]: {checkWin[1]}")
             games += 1
             if checkWin[2] == 1:
                 xWin += 1
@@ -436,19 +414,7 @@ def mc(state, n, debug=False):
                 oWin += 1
             else:
                 stale += 1
-            print(f"checkWin: {checkWin}")
-            print(t.describe_win(checkWin))
-
-    return (games, xWin, oWin, stale)
-
-
-
-        #     if abs(wincount) == self.n:
-        #         return (TicTacToe.Row, i // self.n, self.board[i])
-
-        # if boardFull:
-        #     return (TicTacToe.StaleMate, 0, 0)
-
+    return (games, xWin / games, oWin / games, stale / games)
 
 
 if __name__ == "__main__":
