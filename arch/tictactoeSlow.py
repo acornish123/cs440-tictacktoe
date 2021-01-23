@@ -239,19 +239,15 @@ class TicTacToe():
         player = 1
 
         for i in range(self.n):
-            wincount = 1
+            wincount = 0
 
             if self.board[i] != 0:
-                player = self.board[i]
-                # wincount += 1
-                curSpot = i + self.n
-                for j in range(1, self.n):
-                    if self.board[curSpot] == player:
-                        wincount += 1
-                        curSpot += self.n
-                    else:
-                        break
-                if wincount == self.n:
+                curSpot = i
+                for j in range(0, self.n):
+                    wincount += self.board[curSpot]
+                    curSpot += self.n
+                if abs(wincount) == self.n:
+                    # print("col win")
                     return (TicTacToe.Column, i, self.board[i])
 
         # diagonal win
@@ -265,12 +261,9 @@ class TicTacToe():
                 wincount = 0
 
                 for i in range(self.n):
-                    if self.board[curSpot] == self.board[middlespot]:
-                        wincount += 1
-                        curSpot += (self.n + 1)
-                    else:
-                        break
-                if wincount == self.n:
+                    wincount += self.board[curSpot]
+                    curSpot += (self.n + 1)
+                if abs(wincount) == self.n:
                     return (TicTacToe.Diagonal, 0, self.board[middlespot])
 
                 # check for win from top right
@@ -279,30 +272,24 @@ class TicTacToe():
 
                 for i in range(self.n):
                     # python3 tictactoe.py --state 121212112 --play
-                    if self.board[curSpot] == self.board[middlespot]:
-                        wincount += 1
-                        curSpot += (self.n - 1)
-                    else:
-                        break
-                if wincount == self.n:
+                    wincount += self.board[curSpot]
+                    curSpot += (self.n - 1)
+                if abs(wincount) == self.n:
                     return (TicTacToe.Diagonal, 1, self.board[middlespot])
 
-        # row wins
-        # though -- flipFlag when blank (0) is found -- then can break early -- maybe at start -- before col??
         for i in range(0, self.n2, self.n):
-            wincount = 1
-            player = self.board[i]
+            wincount = 0
             if self.board[i] != 0:
-                for j in range(i + 1, i + self.n):
-                    if self.board[j] == player:
-                        wincount += 1
-                    elif self.board[j] == 0:
+                for j in range(i, i + self.n):
+                    if self.board[j] == 0:
                         boardFull = False
                         break
+                    else:
+                        wincount += self.board[j]
             else:
                 boardFull = False
 
-            if wincount == self.n:
+            if abs(wincount) == self.n:
                 return (TicTacToe.Row, i // self.n, self.board[i])
 
         if boardFull:

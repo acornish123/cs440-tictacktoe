@@ -163,6 +163,8 @@ class TicTacToe():
     def show(self, stream=sys.stdout):
         """_ Part 2: Implement This Method _
         Displays the board on the specified stream."""
+        """ idSpot used to identify the square on the board if open,
+            offset to left to help with quickly seeing open spots """
         sys.stdout = stream
         for i in range(self.n):
             # first line of row
@@ -173,23 +175,20 @@ class TicTacToe():
                     print("|", end='')
             print("")
 
-            # second line of row-- with char
             self.leftMargin()
 
+            # second line of row-- with char
             for j in range(self.n):
                 mark = TicTacToe.Chrs[0]
-                # mark = ' '
                 curSpot = (i * self.n) + j
                 idSpot = curSpot
                 if self.board[curSpot] == -1:
-                    # mark = 'O'
+                    # check for 'O'
                     mark = TicTacToe.Chrs[-1]
                     idSpot = ' '
-                    # mark = (i * self.n) + j
                 elif self.board[curSpot] == 1:
-                    # mark = 'X'
+                    # check for 'X'
                     mark = TicTacToe.Chrs[1]
-
                     idSpot = ' '
 
                 # allow for id on boards larger than n = 9
@@ -234,25 +233,28 @@ class TicTacToe():
         """
         # column win
         # check start of each col for player char
-        boardFull = True
-
+        boardFull = True # flips if open space found
         player = 1
+        wincount = 1
 
         for i in range(self.n):
             wincount = 1
 
             if self.board[i] != 0:
                 player = self.board[i]
-                # wincount += 1
                 curSpot = i + self.n
                 for j in range(1, self.n):
                     if self.board[curSpot] == player:
                         wincount += 1
                         curSpot += self.n
                     else:
+                        if self.board[curSpot] == 0:
+                            boardFull = False
                         break
                 if wincount == self.n:
                     return (TicTacToe.Column, i, self.board[i])
+            else:
+                boardFull = False
 
         # diagonal win
         # check for odd n -- diagonal only possible on odd boards
@@ -278,7 +280,6 @@ class TicTacToe():
                 wincount = 0
 
                 for i in range(self.n):
-                    # python3 tictactoe.py --state 121212112 --play
                     if self.board[curSpot] == self.board[middlespot]:
                         wincount += 1
                         curSpot += (self.n - 1)
@@ -286,8 +287,11 @@ class TicTacToe():
                         break
                 if wincount == self.n:
                     return (TicTacToe.Diagonal, 1, self.board[middlespot])
+            else:
+                boardFull = False
 
-        # row wins
+
+        # row win check and full check for open spaces
         for i in range(0, self.n2, self.n):
             wincount = 1
             player = self.board[i]
@@ -295,9 +299,12 @@ class TicTacToe():
                 for j in range(i + 1, i + self.n):
                     if self.board[j] == player:
                         wincount += 1
-                    elif self.board[j] == 0:
-                        boardFull = False
-                        break
+                    else:
+                        if not boardFull:
+                            break
+                        elif self.board[j] == 0:
+                            boardFull = False
+                            break
             else:
                 boardFull = False
 
@@ -403,6 +410,7 @@ def mc(state, n, debug=False):
     stale = 0
     t = TicTacToe(args.n)
 
+    # create list of available move remaining from state
     availMoves = []
     for i in range(len(state)):
         if state[i] == 0:
@@ -410,15 +418,12 @@ def mc(state, n, debug=False):
 
     for i in range(n):
         t.reset(state)
-        remMoves = availMoves.copy()
-
         checkWin = t.is_win()
+        rmngMoves = availMoves.copy()
 
         while not checkWin:
             # get random move from valid move list
-            moveIndex = randrange(len(remMoves))
-            theMove = remMoves.pop(moveIndex)
-
+            theMove = rmngMoves.pop(randrange(len(rmngMoves)))
             t.move(theMove)
 
             checkWin = t.is_win()
@@ -469,9 +474,7 @@ if __name__ == "__main__":
     t = TicTacToe(args.n)
     if args.play:
         t.reset(state)
-
         t.play(outstream=sys.stdout)
-        # t.play()
 
     elif args.mc:
         start = time.time()
