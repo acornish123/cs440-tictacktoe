@@ -244,8 +244,8 @@ class TicTacToe():
             if self.board[i] != 0:
                 player = self.board[i]
                 # wincount += 1
-                curSpot = i
-                for j in range(0, self.n):
+                curSpot = i + self.n
+                for j in range(1, self.n):
                     if self.board[curSpot] == player:
                         wincount += 1
                         curSpot += self.n
@@ -287,11 +287,12 @@ class TicTacToe():
                 if wincount == self.n:
                     return (TicTacToe.Diagonal, 1, self.board[middlespot])
 
+        # row wins
         for i in range(0, self.n2, self.n):
             wincount = 1
             player = self.board[i]
             if self.board[i] != 0:
-                for j in range(i, i + self.n):
+                for j in range(i + 1, i + self.n):
                     if self.board[j] == player:
                         wincount += 1
                     elif self.board[j] == 0:
@@ -300,7 +301,7 @@ class TicTacToe():
             else:
                 boardFull = False
 
-            if abs(wincount) == self.n:
+            if wincount == self.n:
                 return (TicTacToe.Row, i // self.n, self.board[i])
 
         if boardFull:
